@@ -62,6 +62,26 @@
                 <p id="errorMessage" class="text-red-500 text-center mt-4 hidden font-medium"></p>
             </div>
         </form>
+
+        <!-- Results Screen (Hidden by Default) -->
+        <div id="resultsScreen" class="hidden animate-fade-in text-center space-y-8 py-10">
+            <div
+                class="inline-flex items-center justify-center w-20 h-20 bg-green-100 text-green-600 rounded-full text-4xl mb-4">
+                ✓</div>
+            <h2 class="text-3xl font-bold text-gray-900">Assessment Complete!</h2>
+            <p class="text-gray-600 text-lg">Thank you, <span id="userNameDisplay" class="font-bold"></span>. Your
+                results have been calculated.</p>
+
+            <div id="dimensionScores" class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left mt-8">
+                <!-- Dimension Cards Injected Here -->
+            </div>
+
+            <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-6 mt-8">
+                <p class="text-indigo-900 font-semibold">Check your inbox!</p>
+                <p class="text-indigo-700">A personalized PDF report is being generated and emailed to you right now.
+                </p>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>

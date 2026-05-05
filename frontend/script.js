@@ -1,4 +1,4 @@
-// 1. Data Structure: 3 Dimensions, 3 Questions Each[cite: 1]
+// 1. Data Structure: 3 Dimensions, 3 Questions Each
 const assessmentData = [
     {
         id: "decision",
@@ -29,7 +29,7 @@ const assessmentData = [
     }
 ];
 
-// 2. Dynamically Build the Form[cite: 1]
+// 2. Dynamically Build the Form
 const wrapper = document.getElementById('questionsWrapper');
 
 assessmentData.forEach(dim => {
@@ -63,7 +63,7 @@ assessmentData.forEach(dim => {
     wrapper.appendChild(section);
 });
 
-// 3. Logic: Scoring & Submission[cite: 1]
+// 3. Logic: Scoring & Submission
 const form = document.getElementById('assessmentForm');
 
 form.addEventListener('submit', async (e) => {
@@ -83,14 +83,14 @@ form.addEventListener('submit', async (e) => {
         overallTotal: 0
     };
 
-    // Calculate Scoring & Bands per dimension[cite: 1]
+    // Calculate Scoring & Bands per dimension
     assessmentData.forEach(dim => {
         let total = 0;
         for (let i = 0; i < 3; i++) {
             total += parseInt(formData.get(`${dim.id}_q${i}`));
         }
 
-        // Define Thresholds: 3-7 Low, 8-11 Medium, 12-15 High[cite: 1]
+        // Define Thresholds: 3-7 Low, 8-11 Medium, 12-15 High
         let band = "Low";
         if (total >= 12) band = "High";
         else if (total >= 8) band = "Medium";
@@ -104,7 +104,7 @@ form.addEventListener('submit', async (e) => {
     });
 
     try {
-        // Change URL to your Railway/Render backend once deployed[cite: 1]
+        // Change URL to your Railway/Render backend once deployed
         const response = await fetch('http://localhost:3000/api/submit', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -113,7 +113,7 @@ form.addEventListener('submit', async (e) => {
 
         if (!response.ok) throw new Error("Our email service is currently down. Please try again later.");
 
-        // Show Results Screen[cite: 1]
+        // Show Results Screen
         displayResults(payload);
     } catch (err) {
         errorMsg.innerText = err.message;
