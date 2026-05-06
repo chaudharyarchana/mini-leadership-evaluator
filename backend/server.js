@@ -12,21 +12,17 @@ app.use(express.static('public'));
 
 // Configure Nodemailer transporter
 const transporter = nodemailer.createTransport({
-    // Forced IPv4 for smtp.gmail.com
-    host: '74.125.142.108',
-    port: 587,
-    secure: false,
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASSWORD
     },
-    tls: {
-        // Essential: must match the hostname expected by Gmail
-        servername: 'smtp.gmail.com',
-        rejectUnauthorized: false
-    }
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000
 });
-
 // Verify transporter configuration
 transporter.verify((error, success) => {
     if (error) {
