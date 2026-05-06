@@ -12,8 +12,8 @@ app.use(express.static('public'));
 
 // Configure Nodemailer transporter
 const transporter = nodemailer.createTransport({
-    // Forced IPv4 for smtp.gmail.com
-    host: 'smtp.gmail.com',
+    // Forced IPv4 for smtp.gmail.com to bypass Render's IPv6 routing issues
+    host: '74.125.143.108',
     port: 465,
     secure: true,
     auth: {
@@ -21,13 +21,12 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASSWORD
     },
     tls: {
-        // Essential: must match the hostname expected by Gmail
+        // Required for SNI verification so the certificate matches 'smtp.gmail.com'
         servername: 'smtp.gmail.com',
         rejectUnauthorized: false
     },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 10000
+    connectionTimeout: 15000, // Increased timeout for cloud environment stability
+    socketTimeout: 15000
 });
 
 // Verify transporter configuration
