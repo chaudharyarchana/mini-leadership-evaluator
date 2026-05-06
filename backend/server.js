@@ -21,12 +21,13 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASSWORD
     },
     tls: {
-        // Required for SNI verification so the certificate matches 'smtp.gmail.com'
+        // Essential: must match the hostname expected by Gmail
+        // even though we are using an IP address
         servername: 'smtp.gmail.com',
         rejectUnauthorized: false
     },
-    connectionTimeout: 15000, // Increased timeout for cloud environment stability
-    socketTimeout: 15000
+    connectionTimeout: 20000, // Increased to 20s for cloud stability
+    socketTimeout: 20000
 });
 
 // Verify transporter configuration
