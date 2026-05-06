@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const nodemailer = require('nodemailer');
+const sgMail = require('@sendgrid/mail'); // Official SDK
 const PDFDocument = require('pdfkit');
 
 const app = express();
@@ -10,36 +10,16 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// Configure Nodemailer transporter
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, // true for 465, false for other ports
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD, // Use App Password here
-    },
-});
-
-
-// Verify transporter configuration
-transporter.verify((error, success) => {
-    if (error) {
-        console.error('Email configuration error:', error);
-    } else {
-        console.log('Email server is ready to send messages');
-    }
-});
+// Initialize SendGrid with API Key
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 app.get('/', (req, res) => {
     res.send('Server is running');
 });
 
-// 1. POST Endpoint for Assessment Submission
 app.post('/api/submit', async (req, res) => {
     const { name, email, scores, overallTotal } = req.body;
 
-    // Basic validation
     if (!name || !email || !scores) {
         return res.status(400).json({ error: "Missing required assessment data." });
     }
@@ -47,7 +27,6 @@ app.post('/api/submit', async (req, res) => {
     try {
         const pdfBuffer = await generatePDF({ name, email, scores, overallTotal });
 
-        // 2. Construct the HTML Email
         const dimensionHtml = scores.map(s => `
             <div style="margin-bottom: 15px; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px;">
                 <h3 style="margin: 0; color: #4f46e5;">${s.dimension}</h3>
@@ -56,10 +35,10 @@ app.post('/api/submit', async (req, res) => {
             </div>
         `).join('');
 
-        // 3. Send the Email with Nodemailer
-        const mailOptions = {
-            from: `"Leadership Assessment" <${process.env.EMAIL_USER}>`,
+        // Construct SendGrid Message Object
+        const msg = {
             to: email,
+            from: process.env.EMAIL_USER, // Must be a verified sender in SendGrid
             subject: `Leadership Assessment Report for ${name}`,
             html: `
                 <div style="font-family: sans-serif; max-width: 600px; margin: auto;">
@@ -75,24 +54,22 @@ app.post('/api/submit', async (req, res) => {
             `,
             attachments: [
                 {
+                    content: pdfBuffer.toString('base64'), // SDK requires base64 string
                     filename: 'Leadership_Report.pdf',
-                    content: pdfBuffer,
-                    contentType: 'application/pdf'
+                    type: 'application/pdf',
+                    disposition: 'attachment'
                 }
             ]
         };
 
-        const info = await transporter.sendMail(mailOptions);
-        console.log('Email sent:', info.messageId);
+        await sgMail.send(msg);
+        console.log('Email sent successfully via SendGrid API');
 
-        res.status(200).json({
-            message: "Report emailed with PDF!",
-            messageId: info.messageId
-        });
+        res.status(200).json({ message: "Report emailed with PDF!" });
     } catch (error) {
-        console.error("Email Error:", error);
+        console.error("SendGrid Error:", error.response ? error.response.body : error);
         res.status(503).json({
-            error: "Failed to send the email report.",
+            error: "Failed to send report via SendGrid.",
             details: error.message
         });
     }
@@ -128,7 +105,6 @@ async function generatePDF(data) {
         doc.on('data', buffers.push.bind(buffers));
         doc.on('end', () => resolve(Buffer.concat(buffers)));
 
-        // PDF Content Layout
         doc.fontSize(24).fillColor('#4f46e5').text('Leadership Assessment Report', { align: 'center' });
         doc.moveDown();
         doc.fontSize(14).fillColor('#000').text(`Candidate: ${data.name}`);
