@@ -8,6 +8,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static('public'));
 
 // Configure Nodemailer transporter
 const transporter = nodemailer.createTransport({
@@ -31,6 +32,10 @@ transporter.verify((error, success) => {
     } else {
         console.log('Email server is ready to send messages');
     }
+});
+
+app.get('/', (req, res) => {
+    res.send('Server is running');
 });
 
 // 1. POST Endpoint for Assessment Submission
