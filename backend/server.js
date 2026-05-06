@@ -12,15 +12,17 @@ app.use(express.static('public'));
 
 // Configure Nodemailer transporter
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
+    // Forced IPv4 for smtp.gmail.com
+    host: '74.125.142.108',
     port: 587,
-    secure: false, // Required for Port 587 (STARTTLS)
+    secure: false,
     auth: {
-        user: process.env.EMAIL_USER, // Ensure these match your Render Env Variables
+        user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASSWORD
     },
     tls: {
-        // Essential for cloud environments to prevent certificate handshake failures
+        // Essential: must match the hostname expected by Gmail
+        servername: 'smtp.gmail.com',
         rejectUnauthorized: false
     }
 });
