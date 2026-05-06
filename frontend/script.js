@@ -105,7 +105,7 @@ form.addEventListener('submit', async (e) => {
 
     try {
         // Change URL to your Railway/Render backend once deployed
-        const response = await fetch('http://localhost:3000/api/submit', {
+        const response = await fetch('https://mini-leadership-evaluator.onrender.com/api/submit', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)

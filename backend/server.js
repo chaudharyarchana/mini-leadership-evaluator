@@ -11,10 +11,16 @@ app.use(express.json());
 
 // Configure Nodemailer transporter
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, // Required for Port 587 (STARTTLS)
     auth: {
-        user: process.env.EMAIL_USER,
+        user: process.env.EMAIL_USER, // Ensure these match your Render Env Variables
         pass: process.env.EMAIL_PASSWORD
+    },
+    tls: {
+        // Essential for cloud environments to prevent certificate handshake failures
+        rejectUnauthorized: false
     }
 });
 
